@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Universal Health Card System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #224abe;
+            --accent-color: #1cc88a;
+            --background-color: #f8f9fc;
+            --text-color: #2e384d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Registration Form Styles */
+        .registration-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-section {
+            padding: 2rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e3e6f0;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .camera-section {
+            background: rgba(78, 115, 223, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        #camera-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        #video, #canvas, #captured-photo {
+            width: 100%;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        .camera-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem;
+            position: relative;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .step-number {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e3e6f0;
+            z-index: 0;
+        }
+
+        .progress-line-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background-color: var(--background-color);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(78, 115, 223, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+
+        .btn-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Add loading overlay -->
+    <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Universal Health Card System</h1>
+            <p class="hero-subtitle">A comprehensive digital healthcare management system connecting patients and healthcare providers</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- Patient Section -->
+            <div class="col-md-6">
+                <div class="section-card">
+                    <div class="section-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h2 class="section-title">For Patients</h2>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div>Digital Health Card</div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div>Medical History Tracking</div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-qrcode"></i>
+                            </div>
+                            <div>QR Code Verification</div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div>Digital Medical Records</div>
+                        </li>
+                    </ul>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('user_login') }}" class="btn-section mb-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                        <a href="#registration-form" class="btn-section btn-outline">
+                            <i class="fas fa-user-plus me-2"></i>Register New Card
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hospital Section -->
+            <div class="col-md-6">
+                <div class="section-card">
+                    <div class="section-icon">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <h2 class="section-title">For Healthcare Providers</h2>
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-notes-medical"></i>
+                            </div>
+                            <div>Patient Records Management</div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div>Doctor's Dashboard</div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>Secure Patient Verification</div>
+                        </li>
+                        <li class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>Analytics & Reports</div>
+                        </li>
+                    </ul>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('hospital_login') }}" class="btn-section mb-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>Hospital Login
+                        </a>
+                        <a href="{{ url_for('hospital_register') }}" class="btn-section btn-outline">
+                            <i class="fas fa-hospital-user me-2"></i>Register Hospital
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Form Section -->
+        <div id="registration-form" class="registration-card mt-5">
+            <div class="card-header">
+                <h1 class="header-title">Universal Health Card Registration</h1>
+                <p class="header-subtitle">Your gateway to seamless healthcare access</p>
+            </div>
+
+            <div class="progress-steps">
+                <div class="progress-line">
+                    <div class="progress-line-fill" style="width: 0%"></div>
+                </div>
+                <div class="progress-step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Personal Info</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Photo</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Review</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Complete</div>
+                </div>
+            </div>
+
+            <form action="{{ url_for('register') }}" method="POST" enctype="multipart/form-data" id="registration-form">
+                <div class="form-section">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" required>
+                                <label for="name">Full Name</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="date" class="form-control" id="dob" name="dob" required>
+                                <label for="dob">Date of Birth</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" id="address" name="address" placeholder="Address" style="height: 100px" required></textarea>
+                                <label for="address">Address</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone Number" required>
+                                <label for="phone">Phone Number</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                                <label for="email">Email</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="camera-section">
+                                <h4 class="mb-3">Photo Capture</h4>
+                                <div id="camera-container">
+                                    <video id="video" autoplay playsinline></video>
+                                    <canvas id="canvas" style="display:none;"></canvas>
+                                    <img id="captured-photo" style="display:none;">
+                                    <div class="camera-overlay"></div>
+                                </div>
+                                <input type="hidden" name="photo_data" id="photo_data">
+                                <div class="camera-buttons">
+                                    <button type="button" id="start-camera" class="btn btn-secondary">
+                                        <i class="fas fa-camera me-2"></i>Start Camera
+                                    </button>
+                                    <button type="button" id="capture-photo" class="btn btn-primary" disabled>
+                                        <i class="fas fa-camera-retro me-2"></i>Capture Photo
+                                    </button>
+                                    <button type="button" id="retake-photo" class="btn btn-warning" style="display:none;">
+                                        <i class="fas fa-redo me-2"></i>Retake
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-id-card me-2"></i>Register Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Camera functionality
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capturedPhoto = document.getElementById('captured-photo');
+        const startCameraBtn = document.getElementById('start-camera');
+        const capturePhotoBtn = document.getElementById('capture-photo');
+        const retakePhotoBtn = document.getElementById('retake-photo');
+        const photoDataInput = document.getElementById('photo_data');
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        let stream = null;
+
+        // Progress steps functionality
+        const progressSteps = document.querySelectorAll('.progress-step');
+        const progressLineFill = document.querySelector('.progress-line-fill');
+        let currentStep = 0;
+
+        function updateProgress(step) {
+            currentStep = step;
+            progressLineFill.style.width = `${(step / (progressSteps.length - 1)) * 100}%`;
+            progressSteps.forEach((stepEl, index) => {
+                if (index <= step) {
+                    stepEl.classList.add('active');
+                } else {
+                    stepEl.classList.remove('active');
+                }
+            });
+        }
+
+        // Form input validation
+        const formInputs = document.querySelectorAll('input, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                const allFilled = Array.from(formInputs).every(input => input.value.trim() !== '');
+                if (allFilled) {
+                    updateProgress(1);
+                }
+            });
+        });
+
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                startCameraBtn.disabled = true;
+                capturePhotoBtn.disabled = false;
+                video.style.display = 'block';
+                capturedPhoto.style.display = 'none';
+                updateProgress(2);
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('Could not access camera. Please ensure you have a camera connected and have granted permission.');
+            }
+        });
+
+        capturePhotoBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const photoData = canvas.toDataURL('image/jpeg');
+            capturedPhoto.src = photoData;
+            photoDataInput.value = photoData;
+            
+            video.style.display = 'none';
+            capturedPhoto.style.display = 'block';
+            capturePhotoBtn.style.display = 'none';
+            retakePhotoBtn.style.display = 'block';
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            updateProgress(3);
+        });
+
+        retakePhotoBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                capturedPhoto.style.display = 'none';
+                capturePhotoBtn.style.display = 'inline-block';
+                retakePhotoBtn.style.display = 'none';
+                updateProgress(2);
+            } catch (err) {
+                console.error('Error restarting camera:', err);
+            }
+        });
+
+        document.getElementById('registration-form').addEventListener('submit', (e) => {
+            if (!photoDataInput.value) {
+                e.preventDefault();
+                alert('Please capture your photo before submitting.');
+            } else {
+                loadingOverlay.style.display = 'flex';
+                updateProgress(4);
+            }
+        });
+    </script>
+</body>
+</html>

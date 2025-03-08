@@ -1,0 +1,50 @@
+{
+    "UIN-20250308-3652": [
+        {
+            "record_id": "REC-20250308220941-e5f8f32d",
+            "hospital_id": "HOSP-20250308-ZV1QU3",
+            "hospital_name": "HHB",
+            "doctor_name": "dr xyz",
+            "diagnosis": "FEVER AND COUGH WITH BODY PAIN",
+            "treatment": "TREATED WITH GENERAL MEDINCE AS THERE IS NO SUCH SERIOUS CONDITIONS",
+            "medicines": "dolo 650\r\nCROCIN 300MG\r\nCOYGH CIRPU \r\nCIPLA VITAMIN TABLET",
+            "notes": "",
+            "timestamp": "2025-03-08 22:09:41"
+        },
+        {
+            "record_id": "REC-20250308221125-3a85ff6e",
+            "hospital_id": "HOSP-20250308-ZV1QU3",
+            "hospital_name": "HHB",
+            "doctor_name": "b",
+            "diagnosis": "v",
+            "treatment": "v",
+            "medicines": "vv",
+            "notes": "",
+            "timestamp": "2025-03-08 22:11:25"
+        },
+        {
+            "record_id": "REC-20250308230857-ba61cf23",
+            "hospital_id": "HOSP-20250308-P4NKHY",
+            "hospital_name": "Sidraj",
+            "doctor_name": "dr sidraj",
+            "diagnosis": "FEVER AND COUGH WITH BODY PAIN nad nothing",
+            "treatment": "nothing much",
+            "medicines": "dolo 650",
+            "notes": "",
+            "timestamp": "2025-03-08 23:08:57"
+        }
+    ],
+    "UIN-20250308-C6CG": [
+        {
+            "record_id": "REC-20250308230432-1d8717a1",
+            "hospital_id": "HOSP-20250308-03BJ6X",
+            "hospital_name": "abcd",
+            "doctor_name": "dr xyz",
+            "diagnosis": "FEVER AND COUGH WITH BODY PAIN",
+            "treatment": "vv",
+            "medicines": "v",
+            "notes": "v",
+            "timestamp": "2025-03-08 23:04:32"
+        }
+    ]
+}
